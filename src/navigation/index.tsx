@@ -8,7 +8,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { useColorScheme } from 'react-native';
 // import { ReactNavigationInstrumentation } from '@sentry/react-native';
-// import * as Sentry from '@sentry/react-native';
+import * as Sentry from '@sentry/react-native';
 import { setTheme } from '../redux/actions/theme';
 import navigationList, {
   deepLinking,
@@ -22,11 +22,11 @@ import useDispatch from '../hooks/useDispatch';
 import useSelector from '../hooks/useSelector';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-// type NavigationProps = {
-//   routingInstrumentation?: ReturnType<
-//     typeof Sentry.reactNavigationIntegration
-//   > | null;
-// };
+type NavigationProps = {
+  routingInstrumentation?: ReturnType<
+    typeof Sentry.reactNavigationIntegration
+  > | null;
+};
 
 const Navigation = ({ routingInstrumentation }: NavigationProps) => {
   const navigation = useNavigationContainerRef();

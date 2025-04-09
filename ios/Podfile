@@ -21,8 +21,6 @@ target 'FHB' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    path: "../node_modules/react-native",
-    fabric_enabled: false,
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )

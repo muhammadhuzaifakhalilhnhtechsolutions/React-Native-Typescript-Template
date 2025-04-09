@@ -17,7 +17,7 @@ import {
   NativeExceptionHandler,
 } from 'react-native-exception-handler';
 import FlashMessage from 'react-native-flash-message';
-// import * as Sentry from '@sentry/react-native';
+import * as Sentry from '@sentry/react-native';
 import codePush from 'react-native-code-push';
 
 import Providers from './Providers';
@@ -30,9 +30,7 @@ import './src/translations';
 // enableScreens(true);
 
 // const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
-// reactNavigationIntegration
-// reactNativeTracingIntegration
-// const routingInstrumentation = Sentry.reactNavigationIntegration();
+const routingInstrumentation = Sentry.reactNavigationIntegration();
 
 if (!IS_DEV) {
   codePush
@@ -41,13 +39,13 @@ if (!IS_DEV) {
     .then((update: any) => {
       // eslint-disable-next-line promise/always-return
       if (update) {
-        // Sentry.init({
-        //   dsn: 'https://a13f12a6c6274fd9a22a2759135e5ce5@o1305163.ingest.sentry.io/6629304',
-        //   tracesSampleRate: 0.2,
-        //   integrations: [routingInstrumentation],
-        //   release: `${update.appVersion}+codepush:${update.label}`,
-        //   dist: update.label,
-        // });
+        Sentry.init({
+          dsn: 'https://a13f12a6c6274fd9a22a2759135e5ce5@o1305163.ingest.sentry.io/6629304',
+          tracesSampleRate: 0.2,
+          integrations: [routingInstrumentation],
+          release: `${update.appVersion}+codepush:${update.label}`,
+          dist: update.label,
+        });
       }
     })
     // eslint-disable-next-line promise/prefer-await-to-then
@@ -57,20 +55,20 @@ if (!IS_DEV) {
 const errorHandler: JSExceptionHandler = (e: any, isFatal) => {
   devLog.log('ERROR HANDLER 123');
   devLog.error(e);
-  prodFunction(() => {
-    // Sentry.captureException(e, {
-    //   level: isFatal ? 'error' : 'log',
-    //   extra: { isFatal, isNative: false },
-    // }),
-  });
+  prodFunction(() =>
+    Sentry.captureException(e, {
+      level: isFatal ? 'error' : 'log',
+      extra: { isFatal, isNative: false },
+    }),
+  );
 };
 const nativeErrorHandler: NativeExceptionHandler = errorString => {
-  prodFunction(() => {
-    // Sentry.captureException(errorString, {
-    //   level: 'error',
-    //   extra: { isFatal: true, isNative: true },
-    // }),
-  });
+  prodFunction(() =>
+    Sentry.captureException(errorString, {
+      level: 'error',
+      extra: { isFatal: true, isNative: true },
+    }),
+  );
 };
 
 setNativeExceptionHandler(nativeErrorHandler, false, true);
@@ -81,8 +79,7 @@ const App = () => (
     <Providers>
       <>
         <Navigation
-          routingInstrumentation={null}
-          // routingInstrumentation={!IS_DEV ? routingInstrumentation : null}
+          routingInstrumentation={!IS_DEV ? routingInstrumentation : null}
         />
         <FlashMessage position="top" />
       </>
@@ -90,5 +87,4 @@ const App = () => (
   </ErrorBoundary>
 );
 
-// export default codePush(IS_DEV ? App : Sentry.wrap(App));
-export default App;
+export default codePush(IS_DEV ? App : Sentry.wrap(App));
